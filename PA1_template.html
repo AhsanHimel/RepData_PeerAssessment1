@@ -1782,6 +1782,16 @@ head(med.steps)</code></pre>
 </div>
 <div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+<p><strong>Questions:</strong> For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.</p>
+<ol style="list-style-type: decimal">
+<li>Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.</li>
+<li>Make a panel plot containing a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.</li>
+</ol>
+<p><strong>Solutions:</strong></p>
+<div id="answer-1-3" class="section level3">
+<h3>Answer 1</h3>
+<pre class="r"><code>noNA.activity$weekday &lt;- as.factor(weekdays(noNA.activity$date))</code></pre>
+</div>
 </div>
 
 

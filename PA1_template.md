@@ -213,7 +213,7 @@ activity %>%
 1      835    206.
 ```
 
-## Imputing missing values
+## Imputing missing values {.tabset .tabset-fade .tabset-pills}
 
 **Questions:**   
 Note that there are a number of days/intervals where there are missing values (coded as \color{red}{\verb|NA|}NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
@@ -223,7 +223,132 @@ Note that there are a number of days/intervals where there are missing values (c
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-**Solutions:**   
+**Solutions:** 
+
+### Answer 1
+
+
+```r
+summary(init.activity)
+```
+
+```
+     steps             date               interval     
+ Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+ 1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+ Median :  0.00   Median :2012-10-31   Median :1177.5  
+ Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+ 3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+ Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+ NA's   :2304                                          
+```
+
+```r
+(!complete.cases(init.activity)) %>% sum()
+```
+
+```
+[1] 2304
+```
+There is in total 2304 rows with missing values (NAs).
+
+### Answer 2
+
+We will use average steps by time interval to replace the missing values.
+
+
+```r
+noNA.activity <- init.activity
+med.steps <- aggregate(steps ~ interval, data = noNA.activity, 
+                       FUN = mean)
+head(med.steps)
+```
+
+```
+  interval     steps
+1        0 1.7169811
+2        5 0.3396226
+3       10 0.1320755
+4       15 0.1509434
+5       20 0.0754717
+6       25 2.0943396
+```
+
+### Answer 3
+
+Replacing missing values with the median values found by grouping of intervals -
+
+```r
+noNA.activity$steps <- ifelse(is.na(noNA.activity$steps),
+                        med.steps$steps[match(x = init.activity$interval, 
+                                              table = med.steps$interval)],
+                        noNA.activity$steps)
+```
+
+
+```r
+summary(noNA.activity)
+```
+
+```
+     steps             date               interval     
+ Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+ 1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+ Median :  0.00   Median :2012-10-31   Median :1177.5  
+ Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+ 3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+ Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+```
+
+```r
+str(noNA.activity)
+```
+
+```
+'data.frame':	17568 obs. of  3 variables:
+ $ steps   : num  1.717 0.3396 0.1321 0.1509 0.0755 ...
+ $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+ $ interval: num  0 5 10 15 20 25 30 35 40 45 ...
+```
+
+### Answer 4
+
+
+```r
+noNA.activity %>%
+  group_by(date) %>%
+  summarise(steps = sum(steps)) %>% 
+  ggplot() +
+  geom_histogram(aes(x = steps), boundary = 0, 
+                 binwidth = 2700, col = "darkgreen", fill = "lightgreen") +
+  scale_x_continuous(breaks = seq(0, 22000, 2700)) +
+  scale_y_continuous(breaks = seq(0, 20, 3)) +
+  theme_bw() +
+  labs(title = "Histogram of steps taken per day",
+       subtitle = "With new data set with replaced missing values",
+       x = "Steps per day", y = "No. of days") +
+  theme(plot.title = element_text(face = "bold", size = 15, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+**Questions:**
+For this part the \color{red}{\verb|weekdays()|}weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+2. Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+**Solutions:**
+
+### Answer 1
+
+
+```r
+noNA.activity$weekday <- as.factor(weekdays(noNA.activity$date))
+```
+
+
