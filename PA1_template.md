@@ -334,7 +334,7 @@ noNA.activity %>%
 ![](PA1_template_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
 
-## Are there differences in activity patterns between weekdays and weekends?
+## Are there differences in activity patterns between weekdays and weekends? {.tabset .tabset-fade .tabset-pills}
 
 **Questions:**
 For this part the \color{red}{\verb|weekdays()|}weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
@@ -348,7 +348,61 @@ For this part the \color{red}{\verb|weekdays()|}weekdays() function may be of so
 
 
 ```r
-noNA.activity$weekday <- as.factor(weekdays(noNA.activity$date))
+noNA.activity$days <- as.factor(weekdays(noNA.activity$date))
+condition <- noNA.activity$days %in% c("Saturday", "Sunday")
+noNA.activity$weekday <- as.factor(
+  ifelse(condition , "weekend", "weekday")
+  )
+summary(noNA.activity)
 ```
 
+```
+     steps             date               interval             days     
+ Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0   Friday   :2592  
+ 1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8   Monday   :2592  
+ Median :  0.00   Median :2012-10-31   Median :1177.5   Saturday :2304  
+ Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5   Sunday   :2304  
+ 3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2   Thursday :2592  
+ Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0   Tuesday  :2592  
+                                                        Wednesday:2592  
+    weekday     
+ weekday:12960  
+ weekend: 4608  
+                
+                
+                
+                
+                
+```
+
+### Answer 2
+
+
+```r
+activity.by.date <- aggregate(steps~interval + weekday, 
+                              data = noNA.activity,
+                              FUN = function(x) round(mean(x),2))
+head(activity.by.date)
+```
+
+```
+  interval weekday steps
+1        0 weekday  2.25
+2        5 weekday  0.45
+3       10 weekday  0.17
+4       15 weekday  0.20
+5       20 weekday  0.10
+6       25 weekday  1.59
+```
+
+
+```r
+activity.by.date %>% ggplot(aes(interval, steps)) +
+  geom_line(col = "darkblue") +
+  facet_wrap(~weekday,ncol = 1) +
+  labs(x = "Interval", y = "Number of Steps",
+       title = "Patterns of steps in weekday and weekends")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
