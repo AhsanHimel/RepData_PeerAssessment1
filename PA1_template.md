@@ -12,7 +12,8 @@ output:
 
 **Setting some global options**
 
-```{r}
+
+```r
 knitr::opts_chunk$set(
   comment = "", 
   message=F, 
@@ -22,7 +23,8 @@ knitr::opts_chunk$set(
 
 **Loading required packages**   
 
-```{r}
+
+```r
 packages <- c("ggplot2", "dplyr")
 
 if("pacman" %in% rownames(installed.packages()) == F){
@@ -45,18 +47,42 @@ Show any code that is needed to -
 **Solution:**  
 
 Loading the data:
-```{r}
+
+```r
 init.activity <- read.csv(unz("activity.zip", "activity.csv"), 
                      colClasses=c("numeric", "Date", "numeric"))
 ```
 
-```{r}
+
+```r
 summary(init.activity)
 ```
 
-```{r}
+```
+     steps             date               interval     
+ Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+ 1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+ Median :  0.00   Median :2012-10-31   Median :1177.5  
+ Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+ 3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+ Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+ NA's   :2304                                          
+```
+
+
+```r
 activity <- subset(init.activity, !is.na(init.activity$steps))
 summary(activity)
+```
+
+```
+     steps             date               interval     
+ Min.   :  0.00   Min.   :2012-10-02   Min.   :   0.0  
+ 1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+ Median :  0.00   Median :2012-10-29   Median :1177.5  
+ Mean   : 37.38   Mean   :2012-10-30   Mean   :1177.5  
+ 3rd Qu.: 12.00   3rd Qu.:2012-11-16   3rd Qu.:1766.2  
+ Max.   :806.00   Max.   :2012-11-29   Max.   :2355.0  
 ```
 
 
@@ -75,16 +101,41 @@ For this part of the assignment, you can ignore the missing values in the datase
 ### Answer 1
 
 Calculating total number of steps taken per day - 
-```{r}
+
+```r
 perday.steps <- aggregate(steps ~ date, data = activity, FUN = sum)
 head(perday.steps)
+```
+
+```
+        date steps
+1 2012-10-02   126
+2 2012-10-03 11352
+3 2012-10-04 12116
+4 2012-10-05 13294
+5 2012-10-06 15420
+6 2012-10-07 11015
+```
+
+```r
 summary(perday.steps)
+```
+
+```
+      date                steps      
+ Min.   :2012-10-02   Min.   :   41  
+ 1st Qu.:2012-10-16   1st Qu.: 8841  
+ Median :2012-10-29   Median :10765  
+ Mean   :2012-10-30   Mean   :10766  
+ 3rd Qu.:2012-11-16   3rd Qu.:13294  
+ Max.   :2012-11-29   Max.   :21194  
 ```
 
 ### Answer 2
 
 Making a histogram of the total number of steps taken per day -
-```{r}
+
+```r
 perday.steps %>% ggplot() +
   geom_histogram(aes(x = steps), boundary = 0, 
                  binwidth = 3000, col = "white", fill = "royalblue4") +
@@ -96,15 +147,27 @@ perday.steps %>% ggplot() +
   theme(plot.title = element_text(face = "bold", size = 15, hjust = 0.5))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
 ### Answer 3
 
 Calculating mean - 
-```{r}
+
+```r
 mean(perday.steps$steps)
 ```
+
+```
+[1] 10766.19
+```
 Calculating median - 
-```{r}
+
+```r
 median(perday.steps$steps)
+```
+
+```
+[1] 10765
 ```
 
 ## What is the average daily activity pattern? {.tabset .tabset-fade .tabset-pills}
@@ -118,7 +181,8 @@ median(perday.steps$steps)
 
 ### Answer 1
 
-```{r}
+
+```r
 activity %>% 
   group_by(interval) %>% 
   summarise(average = mean(steps)) %>% 
@@ -130,13 +194,23 @@ activity %>%
   theme(plot.title = element_text(face = "bold", size = 15, hjust = 0))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
 ### Answer 2
 
-```{r}
+
+```r
 activity %>% 
   group_by(interval) %>% 
   summarise(average = mean(steps)) %>% 
   filter(average == max(average))
+```
+
+```
+# A tibble: 1 x 2
+  interval average
+     <dbl>   <dbl>
+1      835    206.
 ```
 
 ## Imputing missing values
