@@ -139,7 +139,7 @@ activity %>%
   filter(average == max(average))
 ```
 
-## Imputing missing values
+## Imputing missing values {.tabset .tabset-fade .tabset-pills}
 
 **Questions:**   
 Note that there are a number of days/intervals where there are missing values (coded as \color{red}{\verb|NA|}NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
@@ -149,7 +149,62 @@ Note that there are a number of days/intervals where there are missing values (c
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-**Solutions:**   
+**Solutions:** 
+
+### Answer 1
+
+```{r}
+summary(init.activity)
+(!complete.cases(init.activity)) %>% sum()
+```
+There is in total 2304 rows with missing values (NAs).
+
+### Answer 2
+
+We will use average steps by time interval to replace the missing values.
+
+```{r}
+noNA.activity <- init.activity
+med.steps <- aggregate(steps ~ interval, data = noNA.activity, 
+                       FUN = mean)
+head(med.steps)
+```
+
+### Answer 3
+
+Replacing missing values with the median values found by grouping of intervals -
+```{r}
+noNA.activity$steps <- ifelse(is.na(noNA.activity$steps),
+                        med.steps$steps[match(x = init.activity$interval, 
+                                              table = med.steps$interval)],
+                        noNA.activity$steps)
+```
+
+```{r}
+summary(noNA.activity)
+```
+```{r}
+str(noNA.activity)
+```
+
+### Answer 4
+
+```{r}
+noNA.activity %>%
+  group_by(date) %>%
+  summarise(steps = sum(steps)) %>% 
+  ggplot() +
+  geom_histogram(aes(x = steps), boundary = 0, 
+                 binwidth = 2700, col = "darkgreen", fill = "lightgreen") +
+  scale_x_continuous(breaks = seq(0, 22000, 2700)) +
+  scale_y_continuous(breaks = seq(0, 20, 3)) +
+  theme_bw() +
+  labs(title = "Histogram of steps taken per day",
+       subtitle = "With new data set with replaced missing values",
+       x = "Steps per day", y = "No. of days") +
+  theme(plot.title = element_text(face = "bold", size = 15, hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
