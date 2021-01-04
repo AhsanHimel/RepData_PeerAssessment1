@@ -6,6 +6,7 @@ output:
     keep_md: true
     toc_float: true
     toc: true
+    code_download: true
 ---
 
 ---
@@ -43,6 +44,8 @@ Show any code that is needed to -
 
 1. Load the data   
 2. Process/transform the data (if necessary) into a format suitable for your analysis   
+
+Get help with your [R and Statistics assignments](https://www.homeworkhelponline.net "Statistics programming help").
 
 **Solution:**  
 
